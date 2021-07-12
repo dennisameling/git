@@ -30,6 +30,9 @@ jobs:
       with:
         repository: 'microsoft/vcpkg'
         path: 'compat/vcbuild/vcpkg'
-    - run: cmake ./contrib/buildsystems/ -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON -DCMAKE_C_COMPILER=${{ env.LLVM_PATH }}/bin/clang.exe -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++.exe -G "MinGW Makefiles"
+    - shell: bash
+      run: |
+        cmake ./contrib/buildsystems/ -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON \
+        -DCMAKE_C_COMPILER=${{ env.LLVM_PATH }}/bin/clang.exe -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++.exe -G "MinGW Makefiles"
     - shell: pwsh
       run: make
