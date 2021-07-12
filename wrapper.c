@@ -172,7 +172,7 @@ void *xcalloc(size_t nmemb, size_t size)
  */
 int xopen(const char *path, int oflag, ...)
 {
-	mode_t mode = 0;
+	_mode_t mode = 0;
 	va_list ap;
 
 	/*

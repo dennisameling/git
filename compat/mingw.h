@@ -123,7 +123,7 @@ struct utsname {
  * trivial stubs
  */
 
-static inline int fchmod(int fildes, mode_t mode)
+static inline int fchmod(int fildes, _mode_t mode)
 { errno = ENOSYS; return -1; }
 #ifndef __MINGW64_VERSION_MAJOR
 static inline pid_t fork(void)
@@ -417,7 +417,7 @@ int mingw_fstat(int fd, struct stat *buf);
 extern int (*lstat)(const char *file_name, struct stat *buf);
 
 
-int mingw_utime(const char *file_name, const struct utimbuf *times);
+int mingw_utime(const char *file_name, const struct _utimbuf *times);
 #define utime mingw_utime
 size_t mingw_strftime(char *s, size_t max,
 		   const char *format, const struct tm *tm);

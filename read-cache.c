@@ -739,7 +739,7 @@ void set_object_name_for_intent_to_add_entry(struct cache_entry *ce)
 int add_to_index(struct index_state *istate, const char *path, struct stat *st, int flags)
 {
 	int namelen, was_same;
-	mode_t st_mode = st->st_mode;
+	_mode_t st_mode = st->st_mode;
 	struct cache_entry *ce, *alias = NULL;
 	unsigned ce_option = CE_MATCH_IGNORE_VALID|CE_MATCH_IGNORE_SKIP_WORKTREE|CE_MATCH_RACY_IS_DIRTY;
 	int verbose = flags & (ADD_CACHE_VERBOSE | ADD_CACHE_PRETEND);

@@ -1230,7 +1230,7 @@ static void write_pack_file(void)
 			} else if (!last_mtime) {
 				last_mtime = st.st_mtime;
 			} else {
-				struct utimbuf utb;
+				struct _utimbuf utb;
 				utb.actime = st.st_atime;
 				utb.modtime = --last_mtime;
 				if (utime(pack_tmp_name, &utb) < 0)

@@ -40,7 +40,7 @@ static struct trace_key trace_fscache = TRACE_KEY_INIT(FSCACHE);
  */
 struct fsentry {
 	struct hashmap_entry ent;
-	mode_t st_mode;
+	_mode_t st_mode;
 	ULONG reparse_tag;
 	/* Pointer to the directory listing, or NULL for the listing itself. */
 	struct fsentry *list;

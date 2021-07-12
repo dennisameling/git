@@ -1,0 +1,27 @@
+name: LLVM build
+
+on: [push, pull_request]
+
+env:
+  LLVM_VERSION: 20210423
+  LLVM_PATH: .\llvm-build\llvm-mingw-${{ env.LLVM_VERISON }}-ucrt-x86_64
+
+jobs:
+  llvm-build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache LLVM
+      id: cache-llvm
+      uses: actions/cache@v2
+      with:
+        path: llvm-build
+        key: llvm-build-${{ env.LLVM_VERSION }}
+    - shell: pwsh
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/20210423/llvm-mingw-20210423-ucrt-x86_64.zip" -OutFile ".\llvm.zip"
+        Expand-Archive -LiteralPath '.\llvm.zip' -DestinationPath .\llvm-build
+    - run: cmake ./contrib/buildsystems/ -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON -G "MinGW Makefiles"
+    - shell: pwsh
+      run: make

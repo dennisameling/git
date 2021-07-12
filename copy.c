@@ -18,7 +18,7 @@ int copy_fd(int ifd, int ofd)
 static int copy_times(const char *dst, const char *src)
 {
 	struct stat st;
-	struct utimbuf times;
+	struct _utimbuf times;
 	if (stat(src, &st) < 0)
 		return -1;
 	times.actime = st.st_atime;
