@@ -25,6 +25,11 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/${{ env.LLVM_VERSION }}/llvm-mingw-${{ env.LLVM_VERSION }}-ucrt-x86_64.zip" -OutFile "./llvm.zip"
         Expand-Archive -LiteralPath './llvm.zip' -DestinationPath ./llvm-build
+    - name: initialize vcpkg
+      uses: actions/checkout@v2
+      with:
+        repository: 'microsoft/vcpkg'
+        path: 'compat/vcbuild/vcpkg'
     - run: cmake ./contrib/buildsystems/ -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON -DCMAKE_C_COMPILER=${{ env.LLVM_PATH }}/bin/clang.exe -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++.exe -G "MinGW Makefiles"
     - shell: pwsh
       run: make
