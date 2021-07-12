@@ -105,7 +105,7 @@ int cmd__chmtime(int argc, const char **argv)
 
 	for (; i < argc; i++) {
 		struct stat sb;
-		struct utimbuf utb;
+		struct _utimbuf utb;
 		uintmax_t mtime;
 
 		if (stat(argv[i], &sb) < 0) {

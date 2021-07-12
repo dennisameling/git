@@ -1141,7 +1141,7 @@ static inline void time_t_to_filetime(time_t t, FILETIME *ft)
 	ft->dwHighDateTime = winTime >> 32;
 }
 
-int mingw_utime (const char *file_name, const struct utimbuf *times)
+int mingw_utime (const char *file_name, const struct _utimbuf *times)
 {
 	FILETIME mft, aft;
 	int fh, rc;

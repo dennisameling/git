@@ -1956,7 +1956,7 @@ static int write_loose_object(const struct object_id *oid, char *hdr,
 	close_loose_object(fd);
 
 	if (mtime) {
-		struct utimbuf utb;
+		struct _utimbuf utb;
 		utb.actime = mtime;
 		utb.modtime = mtime;
 		if (utime(tmp_file.buf, &utb) < 0)

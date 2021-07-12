@@ -2159,7 +2159,7 @@ static void mark_commit_graphs(struct write_commit_graph_context *ctx)
 
 	for (i = ctx->num_commit_graphs_after - 1; i < ctx->num_commit_graphs_before; i++) {
 		struct stat st;
-		struct utimbuf updated_time;
+		struct _utimbuf updated_time;
 
 		stat(ctx->commit_graph_filenames_before[i], &st);
 

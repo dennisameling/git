@@ -403,7 +403,7 @@ static void copy_alternates(struct strbuf *src, const char *src_repo)
 	fclose(in);
 }
 
-static void mkdir_if_missing(const char *pathname, mode_t mode)
+static void mkdir_if_missing(const char *pathname, _mode_t mode)
 {
 	struct stat st;
 

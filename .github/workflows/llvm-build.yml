@@ -1,0 +1,44 @@
+name: LLVM build
+
+on:
+  pull_request:
+
+env:
+  LLVM_VERSION: 20210423
+
+jobs:
+  llvm-build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set LLVM path
+      shell: bash
+      run: echo "LLVM_PATH=`pwd`/llvm-build/llvm-mingw-${{ env.LLVM_VERSION }}-ucrt-x86_64" >> $GITHUB_ENV
+    - name: Cache LLVM
+      id: cache-llvm
+      uses: actions/cache@v2
+      with:
+        path: llvm-build
+        key: llvm-build-${{ env.LLVM_VERSION }}
+    - shell: pwsh
+      if: steps.cache-llvm.outputs.cache-hit != 'true'
+      run: |
+        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/${{ env.LLVM_VERSION }}/llvm-mingw-${{ env.LLVM_VERSION }}-ucrt-x86_64.zip" -OutFile "./llvm.zip"
+        Expand-Archive -LiteralPath './llvm.zip' -DestinationPath ./llvm-build
+    - name: initialize vcpkg
+      uses: actions/checkout@v2
+      with:
+        repository: 'microsoft/vcpkg'
+        path: 'compat/vcbuild/vcpkg'
+    - name: download vcpkg artifacts
+      uses: git-for-windows/get-azure-pipelines-artifact@v0
+      with:
+        repository: git/git
+        definitionId: 9
+    - shell: bash
+      run: |
+        cmake `pwd`/contrib/buildsystems/ -DCMAKE_PREFIX_PATH=`pwd`/compat/vcbuild/vcpkg/installed/x64-windows -DVCPKG_ARCH=x64-windows \
+        -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON \
+        -DCMAKE_C_COMPILER=${{ env.LLVM_PATH }}/bin/clang.exe -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++.exe -G "MinGW Makefiles"
+    - shell: pwsh
+      run: make
