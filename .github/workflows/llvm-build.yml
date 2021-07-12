@@ -12,7 +12,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set LLVM path
-      run: echo "LLVM_PATH=.\llvm-build\llvm-mingw-${{ env.LLVM_VERISON }}-ucrt-x86_64" >> $GITHUB_ENV
+      shell: bash
+      run: echo "LLVM_PATH=./llvm-build/llvm-mingw-${{ env.LLVM_VERSION }}-ucrt-x86_64" >> $GITHUB_ENV
     - name: Cache LLVM
       id: cache-llvm
       uses: actions/cache@v2
@@ -22,8 +23,8 @@ jobs:
     - shell: pwsh
       if: steps.cache-llvm.outputs.cache-hit != 'true'
       run: |
-        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/20210423/llvm-mingw-20210423-ucrt-x86_64.zip" -OutFile ".\llvm.zip"
-        Expand-Archive -LiteralPath '.\llvm.zip' -DestinationPath .\llvm-build
+        Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/${{ env.LLVM_VERSION }}/llvm-mingw-${{ env.LLVM_VERSION }}-ucrt-x86_64.zip" -OutFile "./llvm.zip"
+        Expand-Archive -LiteralPath './llvm.zip' -DestinationPath ./llvm-build
     - run: cmake ./contrib/buildsystems/ -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON -DCMAKE_C_COMPILER=${{ env.LLVM_PATH }}/bin/clang.exe -DCMAKE_CXX_COMPILER=${{ env.LLVM_PATH }}/bin/clang++.exe -G "MinGW Makefiles"
     - shell: pwsh
       run: make
