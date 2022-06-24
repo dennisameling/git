@@ -86,6 +86,12 @@ static inline uint64_t git_bswap64(uint64_t x)
 }
 #endif
 
+/* available since Clang 12 and GCC 10, i.a. needed for ARM64/aarch64 on Windows */
+#elif defined(__has_builtin) && __has_builtin(__builtin_bswap64)
+
+#define bswap32(x)     __builtin_bswap32((x))
+#define bswap64(x)     __builtin_bswap64((x))
+
 #elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64) || defined(_M_ARM64))
 
 #include <stdlib.h>
