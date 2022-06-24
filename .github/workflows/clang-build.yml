@@ -1,0 +1,37 @@
+name: CLANG build
+
+on:
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  clang-build:
+    runs-on: [Windows, ARM64]
+    env:
+      NO_PERL: 1
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dennisameling/setup-git-for-windows-sdk@01872063f7b133eae0732176f08e309a69c22b4d
+        with:
+          flavor: full
+          architecture: aarch64
+      - name: Add clangarm64 server
+        run: |
+          cat <<EOF >> /etc/pacman.conf
+          [clangarm64]
+          Server = https://mirror.msys2.org/mingw/clangarm64/
+          EOF
+          pacman -Sy
+      - name: Install packages
+        # The clangarm64 folder is missing in the Git for Windows SDK, so let's create it
+        run: |
+          mkdir -p /clangarm64
+          pacman -S --noconfirm base-devel mingw-w64-clang-aarch64-openssl mingw-w64-clang-aarch64-zlib \
+          mingw-w64-clang-aarch64-curl mingw-w64-clang-aarch64-expat \
+          mingw-w64-clang-aarch64-libiconv mingw-w64-clang-aarch64-toolchain \
+          mingw-w64-clang-aarch64-pcre2 mingw-w64-clang-aarch64-libssp
+      - name: Build Git CLANGARM64
+        run: make -j`nproc`
