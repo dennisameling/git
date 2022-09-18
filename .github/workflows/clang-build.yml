@@ -14,7 +14,7 @@ jobs:
       NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
-      - uses: dennisameling/setup-git-for-windows-sdk@2737d10d8a1c0ca6a09127e71cabb60c7db9fded
+      - uses: dennisameling/setup-git-for-windows-sdk@64780106df88147ed441ef06a8cb9c786c3764be
         with:
           flavor: full
           architecture: aarch64
