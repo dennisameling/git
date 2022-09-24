@@ -11,8 +11,6 @@ defaults:
 jobs:
   self-hosted-test-job-1:
     runs-on: [Windows, ARM64]
-    env:
-      NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
       - uses: dennisameling/setup-git-for-windows-sdk@7f942b49c088bfea6a3e2282f6d2c8f424419fdc
@@ -24,12 +22,14 @@ jobs:
     needs: [self-hosted-test-job-1]
     runs-on: [Windows, ARM64]
     steps:
-      - run: echo "Testing!"
+      - uses: actions/checkout@v3
+      - uses: dennisameling/setup-git-for-windows-sdk@7f942b49c088bfea6a3e2282f6d2c8f424419fdc
+        with:
+          flavor: full
+          architecture: aarch64
 
   cloud-runner-test-job-1:
     runs-on: windows-latest
-    env:
-      NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
       - uses: dennisameling/setup-git-for-windows-sdk@7f942b49c088bfea6a3e2282f6d2c8f424419fdc
@@ -40,4 +40,8 @@ jobs:
     needs: [cloud-runner-test-job-1]
     runs-on: windows-latest
     steps:
-      - run: echo "Testing!"
+      - uses: actions/checkout@v3
+      - uses: dennisameling/setup-git-for-windows-sdk@7f942b49c088bfea6a3e2282f6d2c8f424419fdc
+        with:
+          flavor: full
+          architecture: aarch64
