@@ -13,13 +13,12 @@ jobs:
     env:
       NO_PERL: 1
     steps:
-      - uses: dennisameling/setup-git-for-windows-sdk@7ac94604fb3a63a8a0b2d18f047edbb812bce843
+      - uses: dennisameling/setup-git-for-windows-sdk@34977549a33ec5f304dd7bd35a492339c9e52877
         with:
           flavor: full
           architecture: aarch64
       - name: Build Git CLANGARM64
         run: |
-          pacman -S --noconfirm mingw-w64-clang-aarch64-asciidoc
           git clone --depth 1 --single-branch -b windows-arm64 https://github.com/dennisameling/MINGW-packages /usr/src/MINGW-packages
           cd /usr/src/MINGW-packages/mingw-w64-git
           MINGW_ARCH=clangarm64 makepkg-mingw
@@ -31,9 +30,9 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: git-artifacts-zst
-          path: artifacts-zst
+          path: C:/git-sdk-64-full/artifacts-zst
       - name: Upload artifacts
         uses: actions/upload-artifact@v1
         with:
           name: git-artifacts-raw
-          path: artifacts-raw
+          path: C:/git-sdk-64-full/artifacts-raw
