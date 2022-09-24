@@ -1,8 +1,5 @@
 name: CLANG build
 
-on:
-  workflow_dispatch:
-
 defaults:
   run:
     shell: bash
@@ -14,7 +11,7 @@ jobs:
       NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
-      - uses: dennisameling/setup-git-for-windows-sdk@88fd47fca65647b4644a7580a8469f5a3d80a6d7
+      - uses: dennisameling/setup-git-for-windows-sdk@7ac94604fb3a63a8a0b2d18f047edbb812bce843
         with:
           flavor: full
           architecture: aarch64
