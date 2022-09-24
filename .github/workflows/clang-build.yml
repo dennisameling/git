@@ -19,6 +19,7 @@ jobs:
           architecture: aarch64
       - name: Build Git CLANGARM64
         run: |
+          pacman -S --noconfirm mingw-w64-clang-aarch64-asciidoc
           git clone --depth 1 --single-branch -b windows-arm64 https://github.com/dennisameling/MINGW-packages /usr/src/MINGW-packages
           cd /usr/src/MINGW-packages/mingw-w64-git
           MINGW_ARCH=clangarm64 makepkg-mingw
