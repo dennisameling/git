@@ -74,6 +74,7 @@ jobs:
         run: |
           echo $PATH &&
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
+          export GIT_TRACE=1 &&
           mkdir -p bundle-artifacts &&
 
           { test -n "$REPOSITORY" || REPOSITORY='${{github.repository}}'; } &&
