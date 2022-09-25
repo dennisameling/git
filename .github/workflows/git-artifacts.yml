@@ -40,7 +40,7 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
+      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
         with:
           flavor: build-installers
           architecture: aarch64
@@ -135,10 +135,10 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
+      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
         if: env.SKIP != 'true'
         with:
-          flavor: build-installers
+          flavor: makepkg-git
           architecture: aarch64
       - name: Download bundle-artifacts
         if: env.SKIP != 'true'
@@ -158,7 +158,7 @@ jobs:
             git -C $d fetch https://github.com/dennisameling/build-extra portable-clangarm64 &&
             git -C $d switch -C portable-clangarm64 FETCH_HEAD
           fi &&
-          git -C $d pull "$PWD"/bundle-artifacts/build-extra.bundle portable-clangarm64
+          git -C $d pull "$PWD"/bundle-artifacts/build-extra.bundle main
       - name: Check out git/git
         if: env.SKIP != 'true'
         shell: bash
@@ -287,7 +287,7 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
+      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
         with:
           flavor: build-installers
           architecture: aarch64
@@ -375,7 +375,7 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
+      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
