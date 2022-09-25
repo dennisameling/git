@@ -72,6 +72,7 @@ jobs:
           GPGKEY: ${{secrets.GPGKEY}}
         shell: bash
         run: |
+          echo $PATH &&
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
           mkdir -p bundle-artifacts &&
 
