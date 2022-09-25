@@ -28,6 +28,9 @@ jobs:
   bundle-artifacts:
     runs-on: [Windows, ARM64]
     steps:
+      - name: Cleanup old SDK stuff
+        shell: bash
+        run: rm -rf C:/git-sdk-64-*
       - name: Configure user
         shell: bash
         run:
@@ -105,6 +108,9 @@ jobs:
           - name: aarch64
             bitness: 64
     steps:
+      - name: Cleanup old SDK stuff
+        shell: bash
+        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
@@ -256,6 +262,9 @@ jobs:
     env:
       MSYSTEM: CLANGARM64
     steps:
+      - name: Cleanup old SDK stuff
+        shell: bash
+        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
@@ -342,6 +351,9 @@ jobs:
     runs-on: [Windows, ARM64]
     needs: pkg
     steps:
+      - name: Cleanup old SDK stuff
+        shell: bash
+        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
