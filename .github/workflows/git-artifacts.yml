@@ -72,6 +72,7 @@ jobs:
           GPGKEY: ${{secrets.GPGKEY}}
         shell: bash
         run: |
+          export PATH="/mingw64/bin:${PATH}" &&
           echo $PATH &&
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
           export GIT_TRACE=1 &&
