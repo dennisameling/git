@@ -40,7 +40,7 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@ad66c9d7870a7a3c2284a6c9ca2ce21135f4f7e8
+      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
         with:
           flavor: build-installers
           architecture: aarch64
@@ -72,10 +72,8 @@ jobs:
           GPGKEY: ${{secrets.GPGKEY}}
         shell: bash
         run: |
-          export PATH="/mingw64/bin:${PATH}" &&
           echo $PATH &&
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
-          export GIT_TRACE=1 &&
           mkdir -p bundle-artifacts &&
 
           { test -n "$REPOSITORY" || REPOSITORY='${{github.repository}}'; } &&
@@ -137,7 +135,7 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@ad66c9d7870a7a3c2284a6c9ca2ce21135f4f7e8
+      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
@@ -289,7 +287,7 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@ad66c9d7870a7a3c2284a6c9ca2ce21135f4f7e8
+      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
         with:
           flavor: build-installers
           architecture: aarch64
@@ -377,7 +375,7 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@ad66c9d7870a7a3c2284a6c9ca2ce21135f4f7e8
+      - uses: dennisameling/setup-git-for-windows-sdk@0781689573a9cb07bb2190ea643744a753fc6c84
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
