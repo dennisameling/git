@@ -15,9 +15,10 @@ jobs:
       NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
-      - uses: dennisameling/setup-git-for-windows-sdk@a4ceb1b63a115ef2647e58fc8a395a01ef76e343
+      - uses: dennisameling/setup-git-for-windows-sdk@97cefe96d61d127d483d67fff96c9fc430cf7b19
         with:
-          flavor: full
+          flavor: makepkg-git
           architecture: aarch64
+          cleanup: true
       - name: Build Git CLANGARM64
         run: make -j`nproc`
