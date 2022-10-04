@@ -15,7 +15,7 @@ jobs:
       NO_PERL: 1
     steps:
       - uses: actions/checkout@v3
-      - uses: git/setup-git-for-windows-sdk@v1
+      - uses: git-for-windows/setup-git-for-windows-sdk@v1
         with:
           flavor: makepkg-git
           architecture: aarch64
