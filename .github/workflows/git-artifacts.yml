@@ -28,9 +28,6 @@ jobs:
   bundle-artifacts:
     runs-on: [Windows, ARM64]
     steps:
-      - name: Cleanup old SDK stuff
-        shell: bash
-        run: rm -rf C:/git-sdk-64-*
       - name: Configure user
         shell: bash
         run:
@@ -40,10 +37,11 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
+      - uses: git-for-windows/setup-git-for-windows-sdk@v1
         with:
           flavor: build-installers
           architecture: aarch64
+          cleanup: true
       - name: Clone build-extra
         shell: bash
         run: |
@@ -109,9 +107,6 @@ jobs:
           - name: aarch64
             bitness: 64
     steps:
-      - name: Cleanup old SDK stuff
-        shell: bash
-        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
@@ -135,11 +130,12 @@ jobs:
           git config --global user.name "$USER_NAME" &&
           git config --global user.email "$USER_EMAIL" &&
           echo "PACKAGER=$USER_NAME <$USER_EMAIL>" >>$GITHUB_ENV
-      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
+      - uses: git-for-windows/setup-git-for-windows-sdk@v1
         if: env.SKIP != 'true'
         with:
           flavor: makepkg-git
           architecture: aarch64
+          cleanup: true
       - name: Download bundle-artifacts
         if: env.SKIP != 'true'
         uses: actions/download-artifact@v1
@@ -164,7 +160,7 @@ jobs:
         shell: bash
         run: |
           git -c init.defaultBranch=main init &&
-          git remote add -f origin https://github.com/dennisameling/git &&
+          git remote add -f origin https://github.com/git-for-windows/git &&
           git fetch --tags bundle-artifacts/git.bundle $(cat bundle-artifacts/next_version) &&
           git reset --hard $(cat bundle-artifacts/next_version)
       - name: Prepare home directory for code-signing
@@ -263,9 +259,6 @@ jobs:
     env:
       MSYSTEM: CLANGARM64
     steps:
-      - name: Cleanup old SDK stuff
-        shell: bash
-        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
@@ -287,10 +280,11 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
+      - uses: git-for-windows/setup-git-for-windows-sdk@v1
         with:
           flavor: build-installers
           architecture: aarch64
+          cleanup: true
       - name: Clone and update build-extra
         if: env.SKIP != 'true'
         shell: bash
@@ -352,9 +346,6 @@ jobs:
     runs-on: [Windows, ARM64]
     needs: pkg
     steps:
-      - name: Cleanup old SDK stuff
-        shell: bash
-        run: rm -rf C:/git-sdk-64-*
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
@@ -375,11 +366,12 @@ jobs:
         with:
           name: bundle-artifacts
           path: bundle-artifacts
-      - uses: dennisameling/setup-git-for-windows-sdk@ef3a752e2659afad18ec29eb44079ea0207092e5
+      - uses: git-for-windows/setup-git-for-windows-sdk@v1
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
           architecture: aarch64
+          cleanup: true
       - name: Clone and update build-extra
         if: env.SKIP != 'true'
         shell: bash
