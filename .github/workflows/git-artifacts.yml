@@ -292,7 +292,7 @@ jobs:
           d=/usr/src/build-extra &&
           if test ! -d $d/.git
           then
-            git clone --single-branch -b portable-clangarm64 https://github.com/dennisameling/build-extra$d
+            git clone --single-branch -b portable-clangarm64 https://github.com/dennisameling/build-extra $d
           else
             git -C $d fetch https://github.com/dennisameling/build-extra portable-clangarm64 &&
             git -C $d switch -C portable-clangarm64 FETCH_HEAD
