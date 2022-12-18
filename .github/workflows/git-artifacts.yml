@@ -18,7 +18,7 @@ on:
 env:
   GPG_OPTIONS: "--batch --yes --no-tty --list-options no-show-photos --verify-options no-show-photos --pinentry-mode loopback"
   HOME: "${{github.workspace}}\\home"
-  MSYSTEM: MINGW64
+  MSYSTEM: CLANGARM64
   USERPROFILE: "${{github.workspace}}\\home"
   BUILD_ONLY: "${{github.event.inputs.build_only}}"
   REPOSITORY: "${{github.event.inputs.repository}}"
@@ -26,7 +26,7 @@ env:
 
 jobs:
   bundle-artifacts:
-    runs-on: windows-latest
+    runs-on: [Windows, ARM64]
     steps:
       - name: Configure user
         shell: bash
@@ -40,6 +40,8 @@ jobs:
       - uses: git-for-windows/setup-git-for-windows-sdk@v1
         with:
           flavor: build-installers
+          architecture: aarch64
+          cleanup: true
       - name: Clone build-extra
         shell: bash
         run: |
@@ -68,6 +70,7 @@ jobs:
           GPGKEY: ${{secrets.GPGKEY}}
         shell: bash
         run: |
+          echo $PATH &&
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
           mkdir -p bundle-artifacts &&
 
@@ -96,17 +99,13 @@ jobs:
           name: bundle-artifacts
           path: bundle-artifacts
   pkg:
-    runs-on: windows-latest
+    runs-on: [Windows, ARM64]
     needs: bundle-artifacts
     strategy:
       matrix:
         arch:
-          - name: x86_64
+          - name: aarch64
             bitness: 64
-            bin: /amd64
-          - name: i686
-            bitness: 32
-            bin: ''
     steps:
       - name: Determine whether this job should be skipped
         shell: bash
@@ -134,7 +133,9 @@ jobs:
       - uses: git-for-windows/setup-git-for-windows-sdk@v1
         if: env.SKIP != 'true'
         with:
-          flavor: build-installers
+          flavor: makepkg-git
+          architecture: aarch64
+          cleanup: true
       - name: Download bundle-artifacts
         if: env.SKIP != 'true'
         uses: actions/download-artifact@v1
@@ -148,10 +149,10 @@ jobs:
           d=/usr/src/build-extra &&
           if test ! -d $d/.git
           then
-            git clone --single-branch -b main https://github.com/git-for-windows/build-extra $d
+            git clone --single-branch -b portable-clangarm64 https://github.com/dennisameling/build-extra $d
           else
-            git -C $d fetch https://github.com/git-for-windows/build-extra main &&
-            git -C $d switch -C main FETCH_HEAD
+            git -C $d fetch https://github.com/dennisameling/build-extra portable-clangarm64 &&
+            git -C $d switch -C portable-clangarm64 FETCH_HEAD
           fi &&
           git -C $d pull "$PWD"/bundle-artifacts/build-extra.bundle main
       - name: Check out git/git
@@ -195,11 +196,10 @@ jobs:
           # Make sure that there is a `/usr/bin/git` that can be used by `makepkg-mingw`
           printf '#!/bin/sh\n\nexec /mingw64/bin/git.exe "$@"\n' >/usr/bin/git &&
 
-          # Restrict `PATH` to MSYS2 and to Visual Studio (to let `cv2pdb` find the relevant DLLs)
-          PATH="/mingw64/bin:/usr/bin:/c/Program Files/Microsoft Visual Studio/2022/Enterprise/Common7/IDE/:/C/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin${{matrix.arch.bin}}:/C/Windows/system32"
+          # Restrict `PATH` to MSYS2
+          PATH="/clangarm64/bin:/mingw64/bin:/usr/bin:/C/Windows/system32"
 
-          type -p mspdb140.dll || exit 1
-          sh -x /usr/src/build-extra/please.sh build-mingw-w64-git --only-${{matrix.arch.bitness}}-bit --build-src-pkg -o artifacts HEAD &&
+          sh -x /usr/src/build-extra/please.sh build-mingw-w64-git --only-arm64 --build-src-pkg -o artifacts HEAD &&
           cp bundle-artifacts/ver artifacts/ &&
           if test -n "$GPGKEY"
           then
@@ -225,88 +225,9 @@ jobs:
         with:
           name: pkg-${{matrix.arch.name}}
           path: artifacts
-  build-arm64:
-    needs: bundle-artifacts
-    runs-on: windows-latest
-    steps:
-      - name: Determine whether this job should be skipped
-        shell: bash
-        run: |
-          for e in ${BUILD_ONLY:-pkg}
-          do
-            case $e in
-            *-arm64) exit 0;; # build this artifact
-            *-*) ;; # not this build artifact, keep looking
-            *) exit 0;; # build this artifact
-            esac
-          done
-          echo "SKIP=true" >>$GITHUB_ENV
-      - name: Configure user
-        if: env.SKIP != 'true'
-        shell: bash
-        run:
-          USER_NAME="${{github.actor}}" &&
-          USER_EMAIL="${{github.actor}}@users.noreply.github.com" &&
-          mkdir -p "$HOME" &&
-          git config --global user.name "$USER_NAME" &&
-          git config --global user.email "$USER_EMAIL"
-      - name: Download bundle-artifacts
-        if: env.SKIP != 'true'
-        uses: actions/download-artifact@v1
-        with:
-          name: bundle-artifacts
-          path: bundle-artifacts
-      - name: Check out git/git
-        if: env.SKIP != 'true'
-        shell: bash
-        run: |
-          git -c init.defaultBranch=main init &&
-          git remote add -f origin https://github.com/git-for-windows/git &&
-          git fetch --tags bundle-artifacts/git.bundle $(cat bundle-artifacts/next_version) &&
-          git reset --hard $(cat bundle-artifacts/next_version)
-      - name: initialize vcpkg
-        if: env.SKIP != 'true'
-        uses: actions/checkout@v2
-        with:
-          repository: 'microsoft/vcpkg'
-          path: 'compat/vcbuild/vcpkg'
-      - name: download vcpkg artifacts
-        if: env.SKIP != 'true'
-        uses: git-for-windows/get-azure-pipelines-artifact@v0
-        with:
-          repository: git/git
-          definitionId: 9
-      - name: add msbuild to PATH
-        if: env.SKIP != 'true'
-        uses: microsoft/setup-msbuild@v1
-      - name: copy dlls to root
-        if: env.SKIP != 'true'
-        shell: powershell
-        run: |
-          & compat\vcbuild\vcpkg_copy_dlls.bat release arm64-windows
-          if (!$?) { exit(1) }
-      - name: generate Visual Studio solution
-        if: env.SKIP != 'true'
-        shell: bash
-        run: |
-          cmake `pwd`/contrib/buildsystems/ -DCMAKE_PREFIX_PATH=`pwd`/compat/vcbuild/vcpkg/installed/arm64-windows \
-          -DNO_GETTEXT=YesPlease -DPERL_TESTS=OFF -DPYTHON_TESTS=OFF -DCURL_NO_CURL_CMAKE=ON -DCMAKE_GENERATOR_PLATFORM=arm64 -DVCPKG_ARCH=arm64-windows \
-          -DCMAKE_INSTALL_PREFIX="`pwd`/git-arm64" -DSKIP_DASHED_BUILT_INS=ON -DHOST_CPU=arm64
-      - name: MSBuild
-        if: env.SKIP != 'true'
-        run: msbuild git.sln -property:Configuration=Release
-      - name: Link the Git executables
-        if: env.SKIP != 'true'
-        run: msbuild INSTALL.vcxproj -property:Configuration=Release
-      - name: upload build artifacts
-        if: env.SKIP != 'true'
-        uses: actions/upload-artifact@v1
-        with:
-          name: arm64-artifacts
-          path: ./git-arm64
   artifacts:
-    runs-on: windows-latest
-    needs: [pkg, build-arm64]
+    runs-on: [Windows, ARM64]
+    needs: [pkg]
     strategy:
       matrix:
         artifact:
@@ -326,27 +247,22 @@ jobs:
             fileprefix: MinGit
             fileextension: zip
         arch:
-          - name: x86_64
+          #- name: x86_64
+          #  bitness: 64
+          #  arm64: false
+          #- name: i686
+          #  bitness: 32
+          #  arm64: false
+          - name: aarch64
             bitness: 64
-            arm64: false
-          - name: i686
-            bitness: 32
-            arm64: false
-          - name: i686
-            bitness: 32
-            arm64: true
       fail-fast: false
     env:
-      MSYSTEM: MINGW${{matrix.arch.bitness}}
+      MSYSTEM: CLANGARM64
     steps:
       - name: Determine whether this job should be skipped
         shell: bash
         run: |
-          suffix=${{matrix.arch.name}}
-          if test true = ${{matrix.arch.arm64}}
-          then
-            suffix=arm64
-          fi
+          suffix=arm64
           case " $BUILD_ONLY " in
           '  ') ;; # not set; build all
           *" ${{matrix.artifact.name}} "*|*" ${{matrix.artifact.name}}-$suffix "*) ;; # build this artifact
@@ -365,27 +281,10 @@ jobs:
           name: bundle-artifacts
           path: bundle-artifacts
       - uses: git-for-windows/setup-git-for-windows-sdk@v1
-        if: env.SKIP != 'true' && matrix.arch.bitness == '64'
         with:
           flavor: build-installers
-      - uses: git-for-windows/setup-git-for-windows-sdk@v1
-        if: env.SKIP != 'true' && matrix.arch.bitness == '32'
-        with:
-          flavor: build-installers
-          architecture: i686
-      - name: Download arm64 artifact
-        if: env.SKIP != 'true' && matrix.arch.arm64 == true
-        uses: actions/download-artifact@v1
-        with:
-          name: arm64-artifacts
-          path: ${{github.workspace}}/arm64
-      # Workaround for Git Credential Manager Core on ARM64: https://github.com/git-for-windows/git/issues/3015
-      - name: Create git-credential-manager-core wrapper for ARM64
-        if: env.SKIP != 'true' && matrix.arch.arm64 == true
-        shell: bash
-        run: |
-          printf '%s\n' '#!/bin/sh' 'exec /mingw32/libexec/git-core/git-credential-manager-core.exe "$@"' > arm64/libexec/git-core/git-credential-manager-core
-          chmod +x arm64/libexec/git-core/git-credential-manager-core
+          architecture: aarch64
+          cleanup: true
       - name: Clone and update build-extra
         if: env.SKIP != 'true'
         shell: bash
@@ -393,12 +292,12 @@ jobs:
           d=/usr/src/build-extra &&
           if test ! -d $d/.git
           then
-            git clone --single-branch -b main https://github.com/git-for-windows/build-extra $d
+            git clone --single-branch -b portable-clangarm64 https://github.com/dennisameling/build-extra $d
           else
-            git -C $d fetch https://github.com/git-for-windows/build-extra main &&
-            git -C $d switch -C main FETCH_HEAD
+            git -C $d fetch https://github.com/dennisameling/build-extra portable-clangarm64 &&
+            git -C $d switch -C portable-clangarm64 FETCH_HEAD
           fi &&
-          git -C $d pull "$PWD"/bundle-artifacts/build-extra.bundle main
+          git -C $d pull "$PWD"/bundle-artifacts/build-extra.bundle portable-clangarm64
       - name: Prepare home directory for code-signing
         env:
           CODESIGN_P12: ${{secrets.CODESIGN_P12}}
@@ -415,14 +314,7 @@ jobs:
         shell: bash
         run: |
           set -x
-          if test "${{matrix.arch.arm64}}" = true
-          then
-            ARM64="--include-arm64-artifacts=\"$PWD/arm64\""
-          else
-            ARM64=
-          fi
-
-          eval /usr/src/build-extra/please.sh make_installers_from_mingw_w64_git $ARM64 --version=$(cat pkg-${{matrix.arch.name}}/ver) -o artifacts --${{matrix.artifact.name}} --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.name}}-git-[0-9]*.tar.xz --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.name}}-git-doc-html-[0-9]*.tar.xz &&
+          eval /usr/src/build-extra/please.sh make_installers_from_mingw_w64_git --version=$(cat pkg-${{matrix.arch.name}}/ver) -o artifacts --${{matrix.artifact.name}} --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.name}}-git-[0-9]*.tar.xz --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.name}}-git-doc-html-[0-9]*.tar.xz &&
           if test portable = '${{matrix.artifact.name}}' && test -n "$(git config alias.signtool)"
           then
             git signtool artifacts/PortableGit-*.exe
@@ -445,19 +337,13 @@ jobs:
         shell: bash
         run: rm -rf home
       - name: Publish ${{matrix.artifact.name}}-${{matrix.arch.name}}
-        if: env.SKIP != 'true' && matrix.arch.arm64 != true
+        if: env.SKIP != 'true'
         uses: actions/upload-artifact@v1
         with:
           name: ${{matrix.artifact.name}}-${{matrix.arch.name}}
           path: artifacts
-      - name: Publish ${{matrix.artifact.name}}-arm64
-        if: env.SKIP != 'true' && matrix.arch.arm64 == true
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{matrix.artifact.name}}-arm64
-          path: artifacts
   nuget:
-    runs-on: windows-latest
+    runs-on: [Windows, ARM64]
     needs: pkg
     steps:
       - name: Determine whether this job should be skipped
@@ -484,6 +370,8 @@ jobs:
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
+          architecture: aarch64
+          cleanup: true
       - name: Clone and update build-extra
         if: env.SKIP != 'true'
         shell: bash
