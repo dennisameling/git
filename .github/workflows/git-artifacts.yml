@@ -229,10 +229,10 @@ jobs:
         run: |
           set -x
 
-          MINGW_PREFIX=$(test "${{matrix.arch.name}}" == "aarch64" && echo "/clangarm64" || echo "/mingw64")
+          MINGW_PREFIX_FOR_GIT=$(test "${{matrix.arch.name}}" == "aarch64" && echo "/clangarm64" || echo "/mingw64")
 
           # Make sure that there is a `/usr/bin/git` that can be used by `makepkg-mingw`
-          printf '#!/bin/sh\n\nexec $MINGW_PREFIX/bin/git.exe "$@"\n' >/usr/bin/git &&
+          printf '#!/bin/sh\n\nexec $MINGW_PREFIX_FOR_GIT/bin/git.exe "$@"\n' >/usr/bin/git &&
 
           # We don't use `cv2pdb` on aarch64, which we build using Clang instead of GCC
           if test "${{matrix.arch.name}}" != "aarch64"
@@ -246,7 +246,7 @@ jobs:
           fi &&
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
-          $MINGW_PREFIX/bin/curl.exe https://raw.githubusercontent.com/git-for-windows/build-extra/3d6fc6dfe74902644c042500ad80e17abd134bfc/please.sh -o /usr/src/build-extra/please.sh &&
+          $MINGW_PREFIX_FOR_GIT/bin/curl.exe https://raw.githubusercontent.com/git-for-windows/build-extra/3d6fc6dfe74902644c042500ad80e17abd134bfc/please.sh -o /usr/src/build-extra/please.sh &&
 
           sh -x /usr/src/build-extra/please.sh build-mingw-w64-git --only-${{matrix.arch.name}} --build-src-pkg -o artifacts HEAD &&
           cp bundle-artifacts/ver artifacts/ &&
