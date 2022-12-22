@@ -248,7 +248,7 @@ jobs:
           fi &&
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
-          $CURL_EXE https://raw.githubusercontent.com/git-for-windows/build-extra/3d6fc6dfe74902644c042500ad80e17abd134bfc/please.sh -o /usr/src/build-extra/please.sh &&
+          $CURL_EXE https://raw.githubusercontent.com/dennisameling/build-extra/e011d559302b2c2f75c947c1300ebe6c9954d136/please.sh -o /usr/src/build-extra/please.sh &&
 
           sh -x /usr/src/build-extra/please.sh build-mingw-w64-git --only-${{matrix.arch.name}} --build-src-pkg -o artifacts HEAD &&
           cp bundle-artifacts/ver artifacts/ &&
@@ -410,7 +410,7 @@ jobs:
           set -x
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
-          /mingw${{matrix.arch.bitness}}/bin/curl.exe https://raw.githubusercontent.com/git-for-windows/build-extra/3d6fc6dfe74902644c042500ad80e17abd134bfc/please.sh -o /usr/src/build-extra/please.sh &&
+          /mingw${{matrix.arch.bitness}}/bin/curl.exe https://raw.githubusercontent.com/dennisameling/build-extra/e011d559302b2c2f75c947c1300ebe6c9954d136/please.sh -o /usr/src/build-extra/please.sh &&
 
           eval /usr/src/build-extra/please.sh make_installers_from_mingw_w64_git --version=$(cat pkg-${{matrix.arch.name}}/ver) -o artifacts --${{matrix.artifact.name}} --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.pacman_arch}}-git-[0-9]*.tar.xz --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.pacman_arch}}-git-doc-html-[0-9]*.tar.xz &&
           if test portable = '${{matrix.artifact.name}}' && test -n "$(git config alias.signtool)"
