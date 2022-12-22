@@ -361,7 +361,8 @@ jobs:
           mingw-w64-clang-aarch64-xpdf-tools-4.00-1-any.pkg.tar.zst
           mingw-w64-clang-aarch64-git-credential-manager-2.0.886-1-any.pkg.tar.zst
           mingw-w64-clang-aarch64-git-lfs-3.3.0-1-any.pkg.tar.zst
-          git-extra-1.1.616.ced335bb5-1-any.pkg.tar.zst"
+          git-extra-1.1.616.ced335bb5-1-any.pkg.tar.zst
+          mingw-w64-clang-aarch64-osslsigncode-2.5-3-any.pkg.tar.zst"
 
           mkdir -p $package_dir && cd $package_dir
 
