@@ -244,13 +244,11 @@ jobs:
             CURL_EXE="/mingw64/bin/curl.exe"
           else
             printf '#!/bin/sh\n\nexec /clangarm64/bin/git.exe "$@"\n' >/usr/bin/git
-            # We don't want to build dashed built-ins anymore. Let's do this on aarch64 only to begin with
-            export SKIP_DASHED_BUILT_INS=YesPlease
             CURL_EXE="/clangarm64/bin/curl.exe"
           fi &&
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
-          $CURL_EXE https://raw.githubusercontent.com/dennisameling/build-extra/e011d559302b2c2f75c947c1300ebe6c9954d136/please.sh -o /usr/src/build-extra/please.sh &&
+          $CURL_EXE https://raw.githubusercontent.com/dennisameling/build-extra/2fd2598b426b50c6a86ca930ef05e97c6d718cb7/please.sh -o /usr/src/build-extra/please.sh &&
 
           sh -x /usr/src/build-extra/please.sh build-mingw-w64-git --only-${{matrix.arch.name}} --build-src-pkg -o artifacts HEAD &&
           cp bundle-artifacts/ver artifacts/ &&
@@ -429,7 +427,7 @@ jobs:
           esac
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
-          $CURL_EXE_PREFIX/bin/curl.exe https://raw.githubusercontent.com/dennisameling/build-extra/e011d559302b2c2f75c947c1300ebe6c9954d136/please.sh -o /usr/src/build-extra/please.sh &&
+          $CURL_EXE_PREFIX/bin/curl.exe https://raw.githubusercontent.com/dennisameling/build-extra/2fd2598b426b50c6a86ca930ef05e97c6d718cb7/please.sh -o /usr/src/build-extra/please.sh &&
 
           eval /usr/src/build-extra/please.sh make_installers_from_mingw_w64_git --version=$(cat pkg-${{matrix.arch.name}}/ver) -o artifacts --${{matrix.artifact.name}} --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.pacman_arch}}-git-[0-9]*.tar.xz --pkg=pkg-${{matrix.arch.name}}/mingw-w64-${{matrix.arch.pacman_arch}}-git-doc-html-[0-9]*.tar.xz &&
           if test portable = '${{matrix.artifact.name}}' && test -n "$(git config alias.signtool)"
