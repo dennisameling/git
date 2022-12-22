@@ -209,7 +209,9 @@ jobs:
 
           package_dir="tmp-aarch64-deps"
           release_url="https://github.com/dennisameling/git/releases/download/v2.39.0.windows.99"
-          packages="mingw-w64-clang-aarch64-openssl-1.1.1.s-1-any.pkg.tar.zst mingw-w64-clang-aarch64-curl-7.86.0-1-any.pkg.tar.zst"
+          packages="mingw-w64-clang-aarch64-openssl-1.1.1.s-1-any.pkg.tar.zst
+          mingw-w64-clang-aarch64-curl-7.86.0-1-any.pkg.tar.zst
+          mingw-w64-clang-aarch64-osslsigncode-2.5-3-any.pkg.tar.zst"
 
           mkdir -p $package_dir && cd $package_dir
 
