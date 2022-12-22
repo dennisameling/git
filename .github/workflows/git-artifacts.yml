@@ -412,7 +412,21 @@ jobs:
         run: |
           set -x
 
-          CURL_EXE_PREFIX=$(test "${{matrix.arch.name}}" == "aarch64" && echo "/clangarm64" || echo "/mingw64")
+          case "${{matrix.arch.name}}" in
+          aarch64)
+            CURL_EXE_PREFIX="/clangarm64"
+            ;;
+          x86_64)
+            CURL_EXE_PREFIX="/mingw64"
+            ;;
+          i686)
+            CURL_EXE_PREFIX="/mingw32"
+            ;;
+          *)
+            echo "Unhandled arch: ${{matrix.arch.name}}"
+            exit 1
+            ;;
+          esac
 
           # Temp until https://github.com/git-for-windows/build-extra/pull/452 is merged
           $CURL_EXE_PREFIX/bin/curl.exe https://raw.githubusercontent.com/dennisameling/build-extra/e011d559302b2c2f75c947c1300ebe6c9954d136/please.sh -o /usr/src/build-extra/please.sh &&
