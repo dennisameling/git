@@ -146,8 +146,8 @@ jobs:
       - uses: dennisameling/setup-git-for-windows-sdk@native-arm64-sdk
         if: env.SKIP != 'true'
         with:
-          flavor: build-installers
-          architecture: ${{ (matrix.arch.name == 'aarch64' && 'aarch64') || 'x86_64' }}
+          flavor: ${{ matrix.arch.name == 'aarch64' && 'full' || 'build-installers' }}
+          architecture: ${{ matrix.arch.name == 'aarch64' && 'aarch64' || 'x86_64' }}
           # We only have to clean up on self-hosted runners
           cleanup: ${{ (runner.arch == 'ARM64' && true) || false }}
       - name: Download bundle-artifacts
@@ -339,7 +339,7 @@ jobs:
       - uses: dennisameling/setup-git-for-windows-sdk@native-arm64-sdk
         if: env.SKIP != 'true'
         with:
-          flavor: build-installers
+          flavor: ${{ matrix.arch.name == 'aarch64' && 'full' || 'build-installers' }}
           architecture: ${{matrix.arch.name}}
           # We only have to clean up on self-hosted runners
           cleanup: ${{ (runner.arch == 'ARM64' && true) || false }}
