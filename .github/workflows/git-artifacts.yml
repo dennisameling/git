@@ -44,6 +44,7 @@ jobs:
       - uses: dennisameling/setup-git-for-windows-sdk@native-arm64-sdk
         with:
           flavor: build-installers
+          path: D:/git-sdk-64-build-installers
       - name: Clone build-extra
         shell: bash
         run: |
@@ -150,6 +151,7 @@ jobs:
           architecture: ${{ matrix.arch.name == 'aarch64' && 'aarch64' || 'x86_64' }}
           # We only have to clean up on self-hosted runners
           cleanup: ${{ (runner.arch == 'ARM64' && true) || false }}
+          path: D:/git-sdk-${{ matrix.arch.name == 'aarch64' && 'arm64' || '64' }}-${{ matrix.arch.name == 'aarch64' && 'full' || 'build-installers' }}
       - name: Download bundle-artifacts
         if: env.SKIP != 'true'
         uses: actions/download-artifact@v1
@@ -347,6 +349,7 @@ jobs:
           architecture: ${{matrix.arch.name}}
           # We only have to clean up on self-hosted runners
           cleanup: ${{ (runner.arch == 'ARM64' && true) || false }}
+          path: D:/git-sdk-${{ matrix.arch.name == 'aarch64' && 'arm64' || '64' }}-${{ matrix.arch.name == 'aarch64' && 'full' || 'build-installers' }}
       # Until there is a Git SDK for arm64, we'll need to install a few packages manually
       # We install prebuilt binaries to save lots of CI time
       - name: Install aarch64 deps
@@ -470,6 +473,7 @@ jobs:
         if: env.SKIP != 'true'
         with:
           flavor: build-installers
+          path: D:/git-sdk-64-build-installers
       - name: Clone and update build-extra
         if: env.SKIP != 'true'
         shell: bash
